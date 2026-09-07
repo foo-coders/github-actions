@@ -25,10 +25,25 @@ actions/<name>/
 - uses: PierreJeanjacquot/github-actions/actions/foo@foo/v1
 ```
 
+## Development
+
+Workflows YAML is linted with [actionlint](https://github.com/rhysd/actionlint) and formatted with [Prettier](https://prettier.io/), both wired up in `.github/workflows/lint.yml`. Set up both locally with:
+
+```sh
+npm run install-dev-tools
+```
+
+Then:
+
+```sh
+npm run format:check # or `npm run format` to write fixes
+npm run lint
+```
+
 ## Available Actions
 
-| Component                                  | Description                         |
-| ------------------------------------------ | ----------------------------------- |
+| Component | Description |
+| --- | --- |
 | [`release-please`](actions/release-please) | Run Release Please as a GitHub App. |
 
 ## License
