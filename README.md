@@ -27,17 +27,19 @@ actions/<name>/
 
 ## Development
 
-Workflows YAML is linted with [actionlint](https://github.com/rhysd/actionlint) and formatted with [Prettier](https://prettier.io/), both wired up in `.github/workflows/lint.yml`. Set up both locally with:
+Workflows YAML is linted with [actionlint](https://github.com/rhysd/actionlint) and [zizmor](https://zizmor.sh/) (security-focused), and formatted with [Prettier](https://prettier.io/) — all wired up in `.github/workflows/lint.yml` and managed locally via [mise](https://mise.jdx.dev/).
+
+Install the dev tools with:
 
 ```sh
-npm run install-dev-tools
+mise install --locked
 ```
 
 Then:
 
 ```sh
-npm run format:check # or `npm run format` to write fixes
-npm run lint
+mise run format # write formatting fixes
+mise run lint   # check formatting, actionlint, and zizmor
 ```
 
 ## Available Actions
