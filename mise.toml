@@ -15,7 +15,7 @@ run = "prettier --check ."
 run = "actionlint"
 
 [tasks."lint:zizmor"]
-run = "zizmor .github"
+run = "zizmor .github actions"
 
 [tasks.lint]
 depends = [ "lint:format", "lint:actionlint", "lint:zizmor" ]
