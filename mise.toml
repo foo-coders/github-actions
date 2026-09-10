@@ -1,4 +1,5 @@
 [tools]
+node = "26"
 "npm:prettier" = "3.9.6"
 "aqua:actionlint" = "1.7.12"
 "aqua:zizmor" = "1.30.0"
