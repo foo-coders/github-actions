@@ -1,0 +1,77 @@
+name: Release Please
+description: Run Release Please to manage releases from Conventional Commits.
+
+inputs:
+  client-id:
+    description: GitHub App client ID used to mint an installation token.
+    required: true
+  private-key:
+    description: GitHub App private key used to mint an installation token.
+    required: true
+  target-branch:
+    description: Branch Release Please should track. Defaults to the branch the workflow runs on.
+    required: false
+    default: ""
+  major-rolling-tag:
+    description: When "true", move each released package's rolling major tag to the release commit. See this action''s README ("Floating major tag") for the tag-shape assumptions and limitations this relies on.
+    required: false
+    default: "false"
+
+outputs:
+  released:
+    description: 'JSON array of packages released in this run, as `[{"path": ..., "tag": ...},...]` per package. Empty array (`[]`) if nothing released.'
+    value: ${{ steps.build-released.outputs.released }}
+
+runs:
+  using: composite
+  steps:
+    # A GITHUB_TOKEN-authored PR cannot trigger further workflow runs (GitHub
+    # blocks this to avoid recursive runs), so release-please's PRs would
+    # never get CI checks. Minting a GitHub App token works around that.
+    - name: Get Token
+      id: get-token
+      uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+      with:
+        client-id: ${{ inputs.client-id }}
+        private-key: ${{ inputs.private-key }}
+        permission-contents: write
+        permission-issues: write
+        permission-pull-requests: write
+    - name: Run release-please
+      id: run-release-please
+      uses: googleapis/release-please-action@45996ed1f6d02564a971a2fa1b5860e934307cf7 # v5.0.0
+      with:
+        token: ${{ steps.get-token.outputs.token }}
+        target-branch: ${{ inputs.target-branch || github.ref_name }}
+    - name: Build released output
+      id: build-released
+      shell: bash
+      env:
+        PATHS_RELEASED: ${{ steps.run-release-please.outputs.paths_released }}
+        RUN_OUTPUTS: ${{ toJSON(steps.run-release-please.outputs) }}
+      run: |
+        echo "released=$(bash "$GITHUB_ACTION_PATH/scripts/build-released.sh")" >> "$GITHUB_OUTPUT"
+    # Release-please doesn't move rolling major tags itself, so do it here:
+    # force each released package's major tag (release tag with everything
+    # from the first "." stripped, see this action's README) to point at the
+    # commit it just released, for every package that released in this run.
+    - name: Move major tags
+      if: inputs.major-rolling-tag == 'true'
+      shell: bash
+      env:
+        GH_TOKEN: ${{ steps.get-token.outputs.token }}
+        RELEASED: ${{ steps.build-released.outputs.released }}
+        REPOSITORY: ${{ github.repository }}
+        SHA: ${{ github.sha }}
+      run: |
+        failed=0
+        while IFS=$'\t' read -r path tag; do
+          [ -z "$tag" ] && continue
+          major_tag="${tag%%.*}"
+          if gh api "repos/$REPOSITORY/git/ref/tags/$major_tag" >/dev/null 2>&1; then
+            gh api --method PATCH "repos/$REPOSITORY/git/refs/tags/$major_tag" -f sha="$SHA" -F force=true || failed=1
+          else
+            gh api "repos/$REPOSITORY/git/refs" -f ref="refs/tags/$major_tag" -f sha="$SHA" || failed=1
+          fi
+        done < <(jq -r '.[] | [.path, .tag] | @tsv' <<<"$RELEASED")
+        exit "$failed"
