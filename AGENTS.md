@@ -4,6 +4,10 @@
 
 When adding or editing a `uses:` step that references an action outside this repo, pin it to a commit SHA — see [docs/pinning-third-party-actions.md](docs/pinning-third-party-actions.md).
 
+## Release Please
+
+Releases are managed by Release Please, configured across `release-please-config.json` and `.release-please-manifest.json` at the repo root. See [docs/release-please-config.md](docs/release-please-config.md) for the file-naming requirements and what to do when adding a new action.
+
 ## Naming style
 
 Use kebab-case for names in workflow/action YAML — step `id`s, `inputs`, and `outputs` (e.g. `id: get-token`, `target-branch`). Do not use snake_case or camelCase.

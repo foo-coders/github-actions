@@ -9,6 +9,13 @@ Composite action that runs [Release Please](https://github.com/googleapis/releas
 | `client-id` | yes |  | GitHub App client ID used to mint a token. |
 | `private-key` | yes |  | GitHub App private key used to mint a token. |
 | `target-branch` | no |  | Branch Release Please should track. Defaults to `github.ref_name` when left unset. |
+| `major-rolling-tag` | no | `false` | When `true`, move each released package's rolling major tag to the release commit. See [Floating major tag](#floating-major-tag) below for the tag-shape assumptions and limitations this relies on. |
+
+## Outputs
+
+| Name | Description |
+| --- | --- |
+| `released` | JSON array of packages released in this run, as `{"path": ..., "tag": ...}` per package (e.g. `[{"path": "actions/release-please","tag":" release-please/v1.2.3"},...]`). Empty array (`[]`) if nothing released. |
 
 ## Usage
 
@@ -26,9 +33,23 @@ jobs:
         with:
           client-id: ${{ secrets.RELEASE_PLEASE_CLIENT_ID }}
           private-key: ${{ secrets.RELEASE_PLEASE_PRIVATE_KEY }}
+          major-rolling-tag: true
 ```
 
 The caller job must declare `contents: write`, `issues: write`, and `pull-requests: write` permissions itself — a composite action runs inside the caller's job and cannot set its own permissions.
+
+## Floating major tag
+
+With `major-rolling-tag: true`, this action moves each released package's rolling major tag to point at the release commit, for every package that released in that run.
+
+The release tag's shape is whatever your `release-please-config.json`'s `tag-separator`, `include-v-in-tag`, and each package's `component` produce:
+
+| `tag-separator` | `include-v-in-tag` | `component` | Release tag | Major tag |
+| --- | --- | --- | --- | --- |
+| `/` | `true` | `release-please` | `release-please/v1.2.3` | `release-please/v1` |
+| _(empty)_ | `false` | _(none)_ | `1.2.3` | `1` |
+
+**Limitation:** the major tag is derived by stripping the release tag from its first `.` onward, so this only works when the release tag's only `.` characters separate `major.minor.patch`. If a `component` name or `tag-separator` contains a literal `.`, the derivation truncates too early — e.g. component `my.action` or `tag-separator: "."` would wrongly derive major tag. Avoid dots in `component` names and `tag-separator` for any package that uses `major-rolling-tag`.
 
 ## Generating the GitHub App credentials
 

@@ -19,3 +19,9 @@ run = "zizmor .github actions"
 
 [tasks.lint]
 depends = [ "lint:format", "lint:actionlint", "lint:zizmor" ]
+
+[tasks."test:release-please"]
+run = "bash actions/release-please/scripts/build-released.test.sh"
+
+[tasks.test]
+depends = [ "test:release-please" ]
