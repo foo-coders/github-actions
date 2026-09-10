@@ -19,5 +19,5 @@ jobs:
           persist-credentials: false
       - uses: ./actions/release-please # zizmor: ignore[self-repository]
         with:
-          app-id: ${{ secrets.RELEASE_PLEASE_APPLICATION_ID }}
+          client-id: ${{ secrets.RELEASE_PLEASE_CLIENT_ID }}
           private-key: ${{ secrets.RELEASE_PLEASE_PRIVATE_KEY }}
