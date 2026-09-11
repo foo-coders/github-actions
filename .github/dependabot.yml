@@ -1,0 +1,29 @@
+version: 2
+updates:
+  # CI-internal: grouped, and `chore` keeps it out of the changelog.
+  - package-ecosystem: "github-actions"
+    directory: "/.github/workflows"
+    schedule:
+      interval: "weekly"
+    cooldown:
+      default-days: 7
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+    groups:
+      workflow-actions:
+        patterns:
+          - "*"
+
+  # Released packages: ungrouped, and `fix` cuts a patch release per bump.
+  - package-ecosystem: "github-actions"
+    directories:
+      - "/actions/*"
+    schedule:
+      interval: "weekly"
+    cooldown:
+      default-days: 7
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "fix"
+      include: "scope"

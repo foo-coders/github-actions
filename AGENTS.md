@@ -8,6 +8,10 @@ When adding or editing a `uses:` step that references an action outside this rep
 
 Releases are managed by Release Please, configured across `release-please-config.json` and `.release-please-manifest.json` at the repo root. See [docs/release-please-config.md](docs/release-please-config.md) for the file-naming requirements and what to do when adding a new action.
 
+## Dependabot
+
+Dependabot bumps the pinned `uses:` SHAs weekly. Before editing `.github/dependabot.yml`, or when a bump PR's grouping or commit prefix looks wrong, see [docs/dependabot.md](docs/dependabot.md).
+
 ## Naming style
 
 Use kebab-case for names in workflow/action YAML — step `id`s, `inputs`, and `outputs` (e.g. `id: get-token`, `target-branch`). Do not use snake_case or camelCase.
