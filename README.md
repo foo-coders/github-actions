@@ -19,10 +19,10 @@ actions/<name>/
 
 ```yaml
 # Preferred: pinned to a commit SHA
-- uses: PierreJeanjacquot/github-actions/actions/foo@<commit-sha> # v1.2.3
+- uses: foo-coders/github-actions/actions/foo@<commit-sha> # v1.2.3
 
 # Convenience: floats on the latest 1.x release
-- uses: PierreJeanjacquot/github-actions/actions/foo@foo/v1
+- uses: foo-coders/github-actions/actions/foo@foo/v1
 ```
 
 ## Development
