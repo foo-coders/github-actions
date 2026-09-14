@@ -35,8 +35,6 @@ jobs:
       - uses: foo-coders/github-actions/actions/conventional-pr-title@<commit-sha> # v1.0.0
 ```
 
-No `actions/checkout` step is needed — the action reads the pull request from the API, not from a checkout.
-
 The caller job must declare `pull-requests: read` itself — a composite action runs inside the caller's job and cannot set its own permissions.
 
 Keep `synchronize` in the event list if you make this check required for merging. Branch protection evaluates checks against the head commit, and `opened`/`edited`/`reopened` do not fire when a commit is pushed — without `synchronize` the new head would have no run at all, and the pull request would stay blocked.
