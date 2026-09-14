@@ -14,7 +14,10 @@ Dependabot bumps the pinned `uses:` SHAs weekly. Before editing `.github/dependa
 
 ## Naming style
 
-Use kebab-case for names in workflow/action YAML — step `id`s, `inputs`, and `outputs` (e.g. `id: get-token`, `target-branch`). Do not use snake_case or camelCase.
+In workflow and action YAML:
+
+- **Identifiers** — kebab-case: job ids, step `id`s, `inputs`, `outputs` (e.g. `release-please:`, `id: get-token`, `target-branch`).
+- **`name`** — every workflow, job, step, and action carries one, in sentence case: short, descriptive, natural language (e.g. `Get token`, `Build released output`).
 
 ## Documentation audience
 
