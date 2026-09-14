@@ -24,3 +24,5 @@ The `/actions/*` glob picks up new actions on its own: adding `actions/<name>/` 
 ## Reviewing a bump
 
 Dependabot rewrites the pinned SHA and its trailing version comment together, in the shape [pinning-third-party-actions.md](pinning-third-party-actions.md) requires.
+
+A bump inside a [wrapped](pinning-third-party-actions.md#wrapping-rather-than-referencing) action needs one extra judgement. Dependabot prefixes it `fix`, which cuts a patch release — right for a patch or minor bump upstream. When the bump crosses a **major** version upstream, rewrite the prefix to `feat!` before merging: callers tracking the rolling `<name>/v<major>` tag would otherwise be handed a breaking upstream change as a patch, which is exactly what wrapping the action was meant to prevent.

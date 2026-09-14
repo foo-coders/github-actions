@@ -1,0 +1,47 @@
+name: Conventional PR title
+description: Check that a pull request title follows the Conventional Commits specification.
+
+inputs:
+  types:
+    description: Types the PR title may use, one per line.
+    required: false
+    default: |
+      feat
+      fix
+      docs
+      style
+      refactor
+      perf
+      test
+      build
+      ci
+      chore
+      revert
+  scopes:
+    description: Scopes the PR title may use, one per line. Empty (the default) allows any scope.
+    required: false
+    default: ""
+  require-scope:
+    description: When "true", the PR title must carry a scope.
+    required: false
+    default: "false"
+  validate-single-commit:
+    description: When "true", also check the commit message of a pull request that has a single commit. See this action's README ("What gets checked") for why this defaults to "true".
+    required: false
+    default: "true"
+
+runs:
+  using: composite
+  steps:
+    # Inputs are renamed from this action's kebab-case to the upstream action's
+    # camelCase. The type list is passed explicitly rather than left to the
+    # upstream default, so a change to that default can never reach callers.
+    - name: Check PR title
+      uses: amannn/action-semantic-pull-request@48f256284bd46cdaab1048c3721360e808335d50 # v6.1.1
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
+      with:
+        types: ${{ inputs.types }}
+        scopes: ${{ inputs.scopes }}
+        requireScope: ${{ inputs.require-scope }}
+        validateSingleCommit: ${{ inputs.validate-single-commit }}
