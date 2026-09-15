@@ -6,7 +6,7 @@ Composite action that checks a pull request title against the [Conventional Comm
 
 | Name | Required | Default | Description |
 | --- | --- | --- | --- |
-| `types` | no | the 11 [conventional commit types](https://github.com/commitizen/conventional-commit-types) | Types the PR title may use, one per line. |
+| `types` | no | `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `build`, `ci`, `chore`, `revert` | Types the PR title may use, one per line. |
 | `scopes` | no | _(empty)_ | Scopes the PR title may use, one per line. Empty allows any scope. |
 | `require-scope` | no | `false` | When `true`, the PR title must carry a scope. |
 | `validate-single-commit` | no | `true` | When `true`, also check the commit message of a PR that has a single commit. See [What gets checked](#what-gets-checked). |
