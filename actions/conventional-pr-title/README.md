@@ -9,7 +9,6 @@ Composite action that checks a pull request title against the [Conventional Comm
 | `types` | no | `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `build`, `ci`, `chore`, `revert` | Types the PR title may use, one per line. |
 | `scopes` | no | _(empty)_ | Scopes the PR title may use, one per line. Empty allows any scope. |
 | `require-scope` | no | `false` | When `true`, the PR title must carry a scope. |
-| `validate-single-commit` | no | `true` | When `true`, also check the commit message of a PR that has a single commit. See [What gets checked](#what-gets-checked). |
 
 This action has no outputs.
 
@@ -43,7 +42,7 @@ Keep `synchronize` in the event list if you make this check required for merging
 
 **The pull request title**, and nothing else. This assumes a **squash merge**, where the title becomes the message of the single commit that lands on the target branch. On a repository that merges with merge commits or rebases, this check says nothing about the messages that actually reach the history — validate the commits themselves instead.
 
-One case escapes that assumption: when a pull request contains exactly **one** commit, GitHub prefills the squash message from that commit message rather than from the title. `validate-single-commit` defaults to `true` so the commit message is checked too, which is why the assumption holds in both cases.
+One case escapes that assumption: when a pull request contains exactly **one** commit, GitHub prefills the squash message from that commit message rather than from the title. The action always checks that commit message too, which is why the assumption holds in both cases.
 
 ## Reporting failures
 

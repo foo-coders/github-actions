@@ -25,10 +25,6 @@ inputs:
     description: When "true", the PR title must carry a scope.
     required: false
     default: "false"
-  validate-single-commit:
-    description: When "true", also check the commit message of a pull request that has a single commit. See this action's README ("What gets checked") for why this defaults to "true".
-    required: false
-    default: "true"
 
 runs:
   using: composite
@@ -44,4 +40,8 @@ runs:
         types: ${{ inputs.types }}
         scopes: ${{ inputs.scopes }}
         requireScope: ${{ inputs.require-scope }}
-        validateSingleCommit: ${{ inputs.validate-single-commit }}
+        # Not exposed as an input. A pull request with a single commit has its
+        # squash message prefilled from that commit rather than from the title,
+        # so checking it is what makes the title-only contract hold either way.
+        # See this action's README ("What gets checked").
+        validateSingleCommit: "true"
