@@ -46,6 +46,7 @@ mise run lint   # check formatting, actionlint, and zizmor
 
 | Component | Description |
 | --- | --- |
+| [`conventional-pr-title`](actions/conventional-pr-title) | Check that a pull request title follows Conventional Commits. |
 | [`release-please`](actions/release-please) | Run Release Please as a GitHub App. |
 
 ## License

@@ -6,6 +6,9 @@
   "include-v-in-tag": true,
   "initial-version": "1.0.0",
   "packages": {
+    "actions/conventional-pr-title": {
+      "component": "conventional-pr-title"
+    },
     "actions/release-please": {
       "component": "release-please"
     }
