@@ -1,0 +1,36 @@
+name: mise update
+
+on:
+  schedule:
+    # Weekly, early Monday UTC, off the hour to avoid the cron rush.
+    - cron: "30 4 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# A manual run during a scheduled one would otherwise race it and could leave
+# a half-pushed branch behind.
+concurrency:
+  group: mise-update
+  cancel-in-progress: false
+
+jobs:
+  mise-update:
+    name: mise update
+    runs-on: ubuntu-latest
+    # Read-only on purpose: the action's own GitHub App token carries the
+    # write permissions it needs.
+    permissions:
+      contents: read
+    steps:
+      # Required to resolve the local composite action below by path.
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Propose mise updates
+        uses: ./actions/mise-update # zizmor: ignore[self-repository]
+        with:
+          client-id: ${{ secrets.MISE_UPDATE_CLIENT_ID }}
+          private-key: ${{ secrets.MISE_UPDATE_PRIVATE_KEY }}

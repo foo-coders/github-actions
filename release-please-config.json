@@ -9,6 +9,9 @@
     "actions/conventional-pr-title": {
       "component": "conventional-pr-title"
     },
+    "actions/mise-update": {
+      "component": "mise-update"
+    },
     "actions/release-please": {
       "component": "release-please"
     }
