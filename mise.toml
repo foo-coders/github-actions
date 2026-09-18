@@ -1,3 +1,9 @@
+[settings]
+# Hold a freshly-published version back, so one that is yanked or hotfixed in
+# its first week never reaches this repo. This governs every mise command run
+# here, not just the weekly update run. mise's own default is 24h.
+minimum_release_age = "7d"
+
 [tools]
 node = "26"
 "npm:prettier" = "3.9.6"
@@ -20,8 +26,11 @@ run = "zizmor .github actions"
 [tasks.lint]
 depends = [ "lint:format", "lint:actionlint", "lint:zizmor" ]
 
+[tasks."test:mise-update"]
+run = "bash actions/mise-update/scripts/engine.test.sh"
+
 [tasks."test:release-please"]
 run = "bash actions/release-please/scripts/build-released.test.sh"
 
 [tasks.test]
-depends = [ "test:release-please" ]
+depends = [ "test:mise-update", "test:release-please" ]
