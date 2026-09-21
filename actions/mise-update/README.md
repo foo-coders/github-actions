@@ -56,7 +56,7 @@ jobs:
           private-key: ${{ secrets.MISE_UPDATE_PRIVATE_KEY }}
 ```
 
-Check the repository out first — the action reads and rewrites files in your working tree. `contents: read` is all the job itself needs: the action mints its own GitHub App token, and that token carries the write permissions.
+**The `actions/checkout` step is required.** This action reads and rewrites files in your working tree, so without it the workspace is empty and the run fails at the preflight check. `contents: read` is all the job itself needs: the action mints its own GitHub App token, and that token carries the write permissions.
 
 Add `workflow_dispatch` (as above) if you want to run an urgent bump without waiting for the schedule, and a `concurrency` group so a manual run can't overlap a scheduled one.
 
@@ -115,7 +115,7 @@ A root `working-directory` gives the branch `mise-update`. Any other directory g
 
 ## Failure modes
 
-- The run fails immediately if `working-directory` has no mise manifest or no `mise.lock`. mise itself never errors on a missing lockfile, so without this check a mistyped path would leave you with a green job that had checked nothing.
+- The run fails immediately if `working-directory` has no mise manifest or no `mise.lock` — including when the workspace was never checked out. mise itself never errors on a missing lockfile, so without this check a mistyped path would leave you with a green job that had checked nothing.
 - The runner's global mise configuration is never in scope: version discovery is restricted to your project's local config, so the action can only ever propose changes to your project.
 - A registry that fails mid-run costs its own tools, not the whole run — you get a partial pull request rather than none.
 

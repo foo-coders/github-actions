@@ -88,9 +88,12 @@ runs:
       shell: bash
       working-directory: ${{ inputs.working-directory }}
       run: |
+        # A missing actions/checkout step leaves the workspace empty, which
+        # lands here as a missing manifest. It is the likeliest way to
+        # misconfigure this action, hence the hint.
         if ! mise config ls --json |
           jq -e --arg dir "$PWD" 'any(.[]; .path | startswith($dir + "/"))' >/dev/null; then
-          echo "::error title=mise-update::no mise manifest in $PWD"
+          echo "::error title=mise-update::no mise manifest in $PWD - make sure the repository is checked out"
           exit 1
         fi
         if [ ! -f mise.lock ]; then
