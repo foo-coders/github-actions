@@ -15,8 +15,6 @@ This action has no outputs.
 ## Usage
 
 ```yaml
-name: PR title
-
 on:
   pull_request:
     types: [opened, edited, reopened, synchronize]
@@ -26,7 +24,6 @@ permissions:
 
 jobs:
   pr-title:
-    name: Validate PR title
     runs-on: ubuntu-latest
     permissions:
       pull-requests: read
