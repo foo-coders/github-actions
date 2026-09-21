@@ -1,4 +1,4 @@
-name: mise update
+name: Mise update
 description: Propose mise manifest and lockfile updates as a single pull request.
 
 inputs:
