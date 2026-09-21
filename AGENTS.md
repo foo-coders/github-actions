@@ -24,6 +24,10 @@ Wrapping a third-party action rather than referencing it directly has rules of i
 
 Workflow secrets live in the `main-automation` GitHub environment rather than as repository secrets, and every job that reads one declares that environment. See [docs/secrets-environment.md](docs/secrets-environment.md) before adding a workflow or an action that consumes a secret.
 
+## Permissions
+
+A workflow's `permissions:` block governs `GITHUB_TOKEN` and nothing else, so a job gets only what its steps actually read from it. See [docs/workflow-permissions.md](docs/workflow-permissions.md) before writing a `permissions:` block, or documenting the permissions an action requires of its callers.
+
 ## Release Please
 
 Releases are managed by Release Please, configured across `release-please-config.json` and `.release-please-manifest.json` at the repo root. See [docs/release-please-config.md](docs/release-please-config.md) for the file-naming requirements and what to do when adding a new action.
