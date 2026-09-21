@@ -20,6 +20,10 @@ When adding or editing a `uses:` step that references an action outside this rep
 
 Wrapping a third-party action rather than referencing it directly has rules of its own — see [docs/wrapping-third-party-actions.md](docs/wrapping-third-party-actions.md) before adding a wrapper, or changing one's inputs or defaults.
 
+## Secrets
+
+Workflow secrets live in the `main-automation` GitHub environment rather than as repository secrets, and every job that reads one declares that environment. See [docs/secrets-environment.md](docs/secrets-environment.md) before adding a workflow or an action that consumes a secret.
+
 ## Release Please
 
 Releases are managed by Release Please, configured across `release-please-config.json` and `.release-please-manifest.json` at the repo root. See [docs/release-please-config.md](docs/release-please-config.md) for the file-naming requirements and what to do when adding a new action.

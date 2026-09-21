@@ -13,6 +13,9 @@ jobs:
   release-please:
     name: Release Please
     runs-on: ubuntu-latest
+    # Holds the GitHub App credentials, behind a deployment branch policy that
+    # restricts them to main. See docs/secrets-environment.md.
+    environment: main-automation
     steps:
       # Required to resolve the local composite action below by path.
       - name: Checkout
