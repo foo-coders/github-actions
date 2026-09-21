@@ -27,7 +27,7 @@ The output is an array, not an object, so that per-tool pull requests can be add
 ## Usage
 
 ```yaml
-name: mise update
+name: Mise update
 
 on:
   schedule:
@@ -42,7 +42,7 @@ concurrency:
 
 jobs:
   mise-update:
-    name: mise update
+    name: Mise update
     runs-on: ubuntu-latest
     # Holds the app credentials — see "Protecting the credentials" below.
     environment: automation

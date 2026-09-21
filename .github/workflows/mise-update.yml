@@ -1,4 +1,4 @@
-name: mise update
+name: Mise update
 
 on:
   schedule:
@@ -19,7 +19,7 @@ concurrency:
 
 jobs:
   mise-update:
-    name: mise update
+    name: Mise update
     runs-on: ubuntu-latest
     environment: main-automation
     steps:
