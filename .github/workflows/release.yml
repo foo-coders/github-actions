@@ -13,6 +13,7 @@ jobs:
   release-please:
     name: Release Please
     runs-on: ubuntu-latest
+    environment: main-automation
     steps:
       # Required to resolve the local composite action below by path.
       - name: Checkout
