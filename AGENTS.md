@@ -39,6 +39,8 @@ In workflow and action YAML:
 - **Identifiers** — kebab-case: job ids, step `id`s, `inputs`, `outputs` (e.g. `release-please:`, `id: get-token`, `target-branch`).
 - **`name`** — every workflow, job, step, and action carries one, in sentence case: short, descriptive, natural language (e.g. `Get token`, `Build released output`).
 
+This governs the YAML that runs in this repository. The usage examples in `README.md` files go the other way: they leave `name:` out of the workflow, the job and the steps. An example shows a caller the keys they must set for the action to work, and what they call their own workflow, job and steps is theirs to choose — shipping our names in an example pushes a preference dressed as a requirement, and invites a reader to copy it without deciding.
+
 ## Documentation audience
 
 `README.md` files (root and each `actions/<name>/`) are consumer-facing: only what a caller of the action needs — usage, inputs/outputs, setup. Contributor-facing material (repo conventions, config internals, why something is built the way it is) belongs under `docs/` instead, linked from the relevant README or from this file. Keep each explanation in one of the two places and link to it from the other, rather than duplicating it.
