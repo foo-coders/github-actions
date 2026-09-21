@@ -20,10 +20,7 @@ Composite action that runs [Release Please](https://github.com/googleapis/releas
 ## Usage
 
 ```yaml
-permissions:
-  contents: write
-  issues: write
-  pull-requests: write
+permissions: {}
 
 jobs:
   release-please:
@@ -39,7 +36,9 @@ jobs:
           major-rolling-tag: true
 ```
 
-The caller job must declare `contents: write`, `issues: write`, and `pull-requests: write` permissions itself, as well as the `environment:` holding the credentials — a composite action runs inside the caller's job and can set neither.
+This action never uses `GITHUB_TOKEN`, so the caller's `permissions:` can remain empty.
+
+The `environment:` holding the credentials is yours to set — a composite action runs inside the caller's job and cannot declare one.
 
 ## Floating major tag
 
@@ -61,7 +60,7 @@ This action mints a short-lived installation token from a GitHub App at runtime 
 To create the App and its two secrets:
 
 1. GitHub → **Settings** → **Developer settings** → **GitHub Apps** → **New GitHub App**.
-2. Set repository permissions: **Contents**: Read & write, **Issues**: Read & write, **Pull requests**: Read & write, **Metadata**: Read-only.
+2. Set repository permissions: **Contents**: Read & write, **Issues**: Read & write, **Pull requests**: Read & write, **Metadata**: Read-only. These are the _app's_ permissions, not the caller workflow's — the action carries them on the token it mints, which is why the workflow itself needs none.
 3. Disable the webhook (untick **Active**) — this app doesn't need to receive events.
 4. Create the app, then copy the **Client ID** shown on its settings page → use this as `RELEASE_PLEASE_CLIENT_ID`.
 5. On the same page, click **Generate a private key** → downloads a `.pem` file. Its full contents → use this as `RELEASE_PLEASE_PRIVATE_KEY`.

@@ -4,10 +4,10 @@ on:
   push:
     branches: [main]
 
+# Read-only on purpose: the checkout needs it, and the action's own GitHub App
+# token carries the write permissions.
 permissions:
-  contents: write
-  issues: write
-  pull-requests: write
+  contents: read
 
 jobs:
   release-please:
