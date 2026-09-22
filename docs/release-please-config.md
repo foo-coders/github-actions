@@ -26,6 +26,7 @@ Each action is released independently (see the root [README](../README.md#versio
 
 - `release-type: simple` — actions have no language-specific manifest to bump; they just need a release, changelog, and tag.
 - `separate-pull-requests: true` — each action gets its own release PR and version stream, matching the per-action versioning convention.
+- `always-update: true` — release-please otherwise refreshes an open release PR only when the release notes change, so anything that lands on `main` afterwards leaves that PR's branch behind. `main`'s ruleset requires status checks to pass on a branch that is up to date with it, which would leave a stale release PR unmergeable until an unrelated release-worthy commit happened to refresh it. This rebases every open release PR on each run instead, at the cost of extra GitHub API calls.
 - `tag-separator: "/"` + `include-v-in-tag: true` — together produce the `<name>/v<semver>` tag shape documented in the root README.
 - `initial-version: "1.0.0"` — the version proposed for a package's **first ever** release (i.e. while it has no prior release/tag). This only applies once and automatically stops mattering afterward: once a release exists, normal Conventional Commits bump rules take over from the latest release and `initial-version` is never consulted again. This is why it's preferred over `release-as`, which pins _every_ subsequent release until manually removed from the config.
 
