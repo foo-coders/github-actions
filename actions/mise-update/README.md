@@ -32,8 +32,7 @@ on:
     - cron: "30 4 * * 1"
   workflow_dispatch:
 
-permissions:
-  contents: read
+permissions: {}
 
 concurrency:
   group: mise-update
@@ -43,6 +42,8 @@ jobs:
     runs-on: ubuntu-latest
     # Holds the app credentials — see "Protecting the credentials" below.
     environment: automation
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@<commit-sha> # v7.0.1
         with:
@@ -53,7 +54,7 @@ jobs:
           private-key: ${{ secrets.MISE_UPDATE_PRIVATE_KEY }}
 ```
 
-**The `actions/checkout` step is required.** This action reads and rewrites files in your working tree, so without it the workspace is empty and the run fails at the preflight check. `contents: read` is all the workflow needs — the checkout uses it, and the action mints its own GitHub App token that carries the write permissions.
+**The `actions/checkout` step is required.** This action reads and rewrites files in your working tree, so without it the workspace is empty and the run fails at the preflight check. `contents: read` is all the job needs — the checkout uses it, and the action mints its own GitHub App token that carries the write permissions.
 
 Add `workflow_dispatch` (as above) if you want to run an urgent bump without waiting for the schedule, and a `concurrency` group so a manual run can't overlap a scheduled one.
 

@@ -19,8 +19,7 @@ on:
   pull_request:
     types: [opened, edited, reopened, synchronize]
 
-permissions:
-  contents: read
+permissions: {}
 
 jobs:
   pr-title:

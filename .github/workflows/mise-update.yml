@@ -6,10 +6,7 @@ on:
     - cron: "30 4 * * 1"
   workflow_dispatch:
 
-# Read-only on purpose: the checkout needs it, and the action's own GitHub App
-# token carries the write permissions.
-permissions:
-  contents: read
+permissions: {}
 
 # A manual run during a scheduled one would otherwise race it and could leave
 # a half-pushed branch behind.
@@ -22,6 +19,10 @@ jobs:
     name: Mise update
     runs-on: ubuntu-latest
     environment: main-automation
+    # Read-only on purpose: the checkout below needs it, and the action's own
+    # GitHub App token carries the write permissions.
+    permissions:
+      contents: read
     steps:
       # Required to resolve the local composite action below by path.
       - name: Checkout

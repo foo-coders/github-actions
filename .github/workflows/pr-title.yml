@@ -4,8 +4,7 @@ on:
   pull_request:
     types: [opened, edited, reopened, synchronize]
 
-permissions:
-  contents: read
+permissions: {}
 
 jobs:
   pr-title:
@@ -13,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      pull-requests: read
+      pull-requests: read # the title check reads the pull request and its commits
     steps:
       # Required to resolve the local composite action below by path.
       - name: Checkout
