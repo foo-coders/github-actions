@@ -17,6 +17,18 @@ Go through the job's steps and ask, of each, whether it reads `GITHUB_TOKEN`:
 
 The same reasoning applies to a composite action in `actions/`. It cannot declare permissions of its own — it runs inside the caller's job — so whatever it consumes becomes a requirement on every caller, and belongs in that action's `README.md`. Requiring a scope the action never reads pushes a cost onto consumers for nothing.
 
+## Where the block goes
+
+A job-level block **replaces** the workflow-level one rather than merging with it: every scope the job leaves out becomes `none`. A job block written to add one scope silently drops every scope the workflow granted — and the job fails at the step that needed the dropped one, not at the block. A deny-all parent defuses this: with nothing to inherit, there is nothing to drop.
+
+So: `permissions: {}` at workflow level, **always**. A job overrides it only when it needs a scope, and then lists **everything** it needs. A job that needs nothing carries no block at all.
+
+`permissions: {}` is not the same as leaving the block out. An omitted block inherits the repository's default, set at **Settings** → **Actions** → **General** → **Workflow permissions** as either _read and write access for all permissions (the permissive setting)_ or _just read access for the `contents` and `packages` permissions (the restricted setting)_ — and a repository in an organization inherits the organization's choice of the two. An omitted block can therefore mean a read/write token on every scope, decided outside the repository and changeable without a commit.
+
+Document every granted scope with a comment on the same line, naming what needs it (`contents: read # required for checkout`). No scope is exempt — `zizmor`'s `undocumented-permissions` lets `contents: read` pass unannotated, and this convention is the stricter of the two, because a scope explains itself only next to the step that consumes it. The same-line form is the only one that counts; a comment on the line above documents nothing. That audit is pedantic-only, so `mise run lint` enforces none of this.
+
+Reusable workflows work differently and are out of scope here: permissions intersect down the call chain rather than replacing each other.
+
 ## App permissions are not workflow permissions
 
 An action that mints a GitHub App token deals in two unrelated sets of permissions, easily conflated because they are written in the same vocabulary:
@@ -28,4 +40,4 @@ Copying the first list into the second is the common mistake. It reads plausible
 
 ## What the linters do not catch
 
-`zizmor` flags the shape of a permissions block — a missing one, or a workflow-level grant wider than its jobs need. Neither it nor `actionlint` can tell whether a granted scope is ever used, because that would mean knowing what every step does with the token. An unused permission passes `mise run lint` cleanly. This rule is the only check there is.
+`zizmor`'s `excessive-permissions` judges a block in the absolute, never against what the jobs use: it flags a missing block, `read-all`, `write-all`, and every workflow-level `<scope>: write`. It never inspects the steps of a job, so a workflow-level `contents: write` is flagged even when every job needs it, and a workflow-level `contents: read` passes however useless it is. Neither `zizmor` nor `actionlint` can tell whether a granted scope is ever used, because that would mean knowing what every step does with the token. An unused permission passes `mise run lint` cleanly. The rules above are the only check there is.

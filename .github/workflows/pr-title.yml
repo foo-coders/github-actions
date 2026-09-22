@@ -4,16 +4,15 @@ on:
   pull_request:
     types: [opened, edited, reopened, synchronize]
 
-permissions:
-  contents: read
+permissions: {}
 
 jobs:
   pr-title:
     name: Validate PR title
     runs-on: ubuntu-latest
     permissions:
-      contents: read
-      pull-requests: read
+      contents: read # required for checkout
+      pull-requests: read # required for conventional-pr-title
     steps:
       # Required to resolve the local composite action below by path.
       - name: Checkout

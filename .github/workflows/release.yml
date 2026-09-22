@@ -4,16 +4,15 @@ on:
   push:
     branches: [main]
 
-# Read-only on purpose: the checkout needs it, and the action's own GitHub App
-# token carries the write permissions.
-permissions:
-  contents: read
+permissions: {}
 
 jobs:
   release-please:
     name: Release Please
     runs-on: ubuntu-latest
     environment: main-automation
+    permissions:
+      contents: read # required for checkout
     steps:
       # Required to resolve the local composite action below by path.
       - name: Checkout

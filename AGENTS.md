@@ -26,7 +26,7 @@ Workflow secrets live in the `main-automation` GitHub environment rather than as
 
 ## Permissions
 
-A workflow's `permissions:` block governs `GITHUB_TOKEN` and nothing else, so a job gets only what its steps actually read from it. See [docs/workflow-permissions.md](docs/workflow-permissions.md) before writing a `permissions:` block, or documenting the permissions an action requires of its callers.
+A workflow's `permissions:` block governs `GITHUB_TOKEN` and nothing else. Every workflow denies all of it at the top (`permissions: {}`) and grants per job, where a job lists everything its steps actually read and nothing more. See [docs/workflow-permissions.md](docs/workflow-permissions.md) before writing a `permissions:` block, or documenting the permissions an action requires of its callers.
 
 ## Release Please
 
