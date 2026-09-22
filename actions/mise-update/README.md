@@ -43,7 +43,7 @@ jobs:
     # Holds the app credentials — see "Protecting the credentials" below.
     environment: automation
     permissions:
-      contents: read
+      contents: read # required for checkout
     steps:
       - uses: actions/checkout@<commit-sha> # v7.0.1
         with:

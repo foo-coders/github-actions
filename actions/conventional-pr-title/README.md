@@ -25,7 +25,7 @@ jobs:
   pr-title:
     runs-on: ubuntu-latest
     permissions:
-      pull-requests: read
+      pull-requests: read # this action reads the pull request
     steps:
       - uses: foo-coders/github-actions/actions/conventional-pr-title@<commit-sha> # v1.0.0
 ```
