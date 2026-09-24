@@ -22,11 +22,8 @@ run = "prettier --check ."
 run = "actionlint"
 
 [tasks."lint:zizmor"]
-# pedantic turns on two audits this repo wants: undocumented-permissions, which
-# enforces the comment convention in docs/workflow-permissions.md, and
-# concurrency-limits, which is why every workflow here carries a concurrency
-# block. persona is not a valid key in .github/zizmor.yml, so the flag is the
-# only place it can live.
+# pedantic adds undocumented-permissions and concurrency-limits. It has no
+# .github/zizmor.yml equivalent, so the flag is the only option.
 run = "zizmor --persona pedantic .github actions"
 
 [tasks.lint]

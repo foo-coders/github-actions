@@ -6,10 +6,8 @@ on:
 
 permissions: {}
 
-# Two release-please runs racing would act on the same commits, and cancelling
-# one mid-flight can leave a half-created tag or release behind. The group is
-# not scoped by ref: the only trigger is a push to main, so a ref would name one
-# branch the long way round.
+# Racing runs would act on the same commits, and cancelling one mid-flight can
+# leave a half-created tag or release behind.
 concurrency:
   group: release
   cancel-in-progress: false

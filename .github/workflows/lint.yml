@@ -7,9 +7,8 @@ on:
 
 permissions: {}
 
-# A newer push to a pull request supersedes the run before it, whose result is
-# already obsolete. A push to main is never cancelled: that would leave the
-# commit it verifies unlinted.
+# A superseded pull-request run is obsolete; cancelling a push to main would
+# leave that commit unlinted.
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
