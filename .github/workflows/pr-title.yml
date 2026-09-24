@@ -6,6 +6,11 @@ on:
 
 permissions: {}
 
+# An edited title makes the check of the previous one obsolete.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   pr-title:
     name: Validate PR title

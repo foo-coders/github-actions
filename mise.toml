@@ -22,7 +22,7 @@ run = "prettier --check ."
 run = "actionlint"
 
 [tasks."lint:zizmor"]
-run = "zizmor .github actions"
+run = "zizmor --persona pedantic .github actions"
 
 [tasks.lint]
 depends = [ "lint:format", "lint:actionlint", "lint:zizmor" ]

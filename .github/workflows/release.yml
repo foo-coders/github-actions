@@ -6,6 +6,12 @@ on:
 
 permissions: {}
 
+# Racing runs would act on the same commits, and cancelling one mid-flight can
+# leave a half-created tag or release behind.
+concurrency:
+  group: release
+  cancel-in-progress: false
+
 jobs:
   release-please:
     name: Release Please

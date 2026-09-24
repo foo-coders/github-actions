@@ -7,6 +7,12 @@ on:
 
 permissions: {}
 
+# A superseded pull-request run is obsolete; cancelling a push to main would
+# leave that commit unlinted.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   lint:
     name: Lint
