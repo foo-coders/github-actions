@@ -3,6 +3,7 @@
 # its first week never reaches this repo. This governs every mise command run
 # here, not just the weekly update run. mise's own default is 24h.
 minimum_release_age = "7d"
+lockfile = true
 
 [tools]
 node = "26"
