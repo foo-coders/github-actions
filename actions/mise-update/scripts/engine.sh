@@ -1,10 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# The engine is the pure half of this action: it decides what to propose and
-# what to write, and never invokes mise or touches the network. Every mode
-# reads its inputs from the environment and writes one artifact to stdout, so
-# the whole decision surface is exercised by engine.test.sh.
+# Pure: never invokes mise or the network, so engine.test.sh covers every decision.
 #
 #   plan    OUTDATED + TRACKED_PATHS                  -> plan JSON
 #   render title|body|annotations
@@ -12,18 +9,14 @@ set -euo pipefail
 #   render add-paths
 #           PLAN + WORKING_DIRECTORY + WORKSPACE      -> files to commit
 #   branch  WORKING_DIRECTORY + BRANCH                -> branch name
-#
-# See this action's CONTEXT.md for the vocabulary (bump, move, skip, error).
 
+# Print usage and exit non-zero.
 usage() {
   echo "usage: engine.sh plan | render <title|body|annotations> | branch" >&2
   exit 2
 }
 
-# Classify every tool mise reported, keyed on its requested version spec. The
-# distinction that matters is "this could be bumped and something went wrong"
-# (error) versus "there is nothing to bump here" (skip) — reporting a floating
-# spec as an error would train reviewers to ignore the error list.
+# Classify every outdated tool into bumps, skips and errors.
 plan() {
   local outdated="${OUTDATED:-}"
   [ -n "$outdated" ] || outdated='{}'
@@ -33,18 +26,12 @@ plan() {
     --arg tracked "${TRACKED_PATHS:-}" '
     ($tracked | split("\n") | map(select(length > 0))) as $tracked_paths
 
-    # mise proposes a version that is about to be written into a manifest, so
-    # it is sanity-checked first. This is not theoretical: mise 2026.9.10
-    # turns a requested "prefix:1.30" into a proposed "prefix:prefix:1.1".
     | def unsafe($requested; $proposed):
         ($proposed | test("^[0-9]+[0-9A-Za-z.+_-]*$") | not)
         or ($proposed == $requested)
         or (($requested | contains(":")) and ($proposed | contains(":")));
 
-      # A version spec is not always a string: the array and tool-option forms
-      # arrive as an array or an object. Rendering those to text keeps them in
-      # the error bucket instead of crashing the classification — one such
-      # tool must not cost the whole run.
+      # Array and tool-option specs are not strings; one must not crash the run.
       def as_text: if type == "string" then . else tojson end;
 
       def classify:
@@ -81,9 +68,7 @@ plan() {
   '
 }
 
-# A lockfile change identifies its tool by backend ("aqua:zizmor"), except for
-# mise's built-in tools, whose backend carries a "core:" prefix the manifest
-# never uses ("core:node" is written "node").
+# Render one pull request artifact from the plan and lockfile changes.
 render() {
   local artifact="${1:-}"
   case "$artifact" in
@@ -102,9 +87,9 @@ render() {
     --arg workspace "${WORKSPACE:-${GITHUB_WORKSPACE:-}}" \
     --argjson plan "$plan" \
     --argjson lock "$lock" '
+    # The lockfile says "core:node" where the manifest says "node".
     def tool_id: ((.backend // .name // "") | sub("^core:"; ""));
-    # mise reports an empty list when a tool enters or leaves the lockfile
-    # rather than moving between two versions.
+    # Empty when a tool enters or leaves the lockfile.
     def versions:
       (if type == "array" then join(", ") else (. // "") end)
       | if . == "" then "—" else . end;
@@ -115,8 +100,7 @@ render() {
     (($plan.bumps // []) | map(. + {id: .name})) as $bumps
     | ($bumps | map(.id)) as $bump_ids
     | ($lock | map(. + {id: tool_id})) as $locked
-    # A tool bumped in the manifest also moves in the lockfile; listing it in
-    # both sections would read as two separate changes and double the count.
+    # A manifest bump also moves the lockfile; list it once.
     | ($locked | map(select(.id as $i | $bump_ids | index($i) | not))) as $moves
     | (($bump_ids + ($locked | map(.id))) | unique | length) as $count
     | ($plan.errors // []) as $errors
@@ -129,8 +113,7 @@ render() {
           end
         )
 
-      # Only the manifests the plan actually edited, plus the lockfile. A
-      # change any other step left in the working tree is not ours to propose.
+      # Other working-tree changes are not ours to propose.
       elif $artifact == "add-paths" then
         (($dir | ltrimstr("./") | rtrimstr("/")) as $d
          | (if $d == "" or $d == "." then "mise.lock" else $d + "/mise.lock" end)) as $lockfile
@@ -176,10 +159,7 @@ render() {
   '
 }
 
-# One stable branch per working directory, so the pull request is amended in
-# place rather than re-opened. The root case cannot simply append the path:
-# "mise-update-." is not a legal ref, and "mise-update/<path>" would collide
-# with the bare "mise-update" ref in a repo that needs both.
+# Derive the pull request branch from the working directory.
 branch() {
   local override="${BRANCH:-}"
   if [ -n "$override" ]; then
@@ -197,6 +177,7 @@ branch() {
       -e 's|^[-.]*||' \
       -e 's|[-.]*$||')
 
+  # "mise-update-." is no legal ref
   if [ -z "$slug" ]; then
     echo "mise-update"
   else

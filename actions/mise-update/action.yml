@@ -37,9 +37,6 @@ outputs:
 runs:
   using: composite
   steps:
-    # A GITHUB_TOKEN-authored PR cannot trigger further workflow runs (GitHub
-    # blocks this to avoid recursive runs), which would leave every update PR
-    # without the CI that is the only thing verifying the new versions.
     - name: Get token
       id: get-token
       uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
@@ -56,41 +53,24 @@ runs:
         BRANCH: ${{ inputs.branch }}
       run: |
         echo "branch=$(bash "$GITHUB_ACTION_PATH/scripts/engine.sh" branch)" >> "$GITHUB_OUTPUT"
-    # install: false is what keeps the run free of toolchain downloads — the
-    # engine needs the mise binary, not the tools. cache: false follows from
-    # it: with nothing installed, upstream restores a cache it never saves.
-    # github_token keeps version resolution off the unauthenticated rate
-    # limit, which matters because resolving versions is the whole job.
-    # minimum_release_age asks for an aged mise binary and is ignored by
-    # upstream when version is set, so both are passed unconditionally.
     - name: Setup mise
       uses: jdx/mise-action@c2a87611a18de5b3828c5652fe268e992400cb5c # v4.3.0
       with:
         version: ${{ inputs.mise-version }}
-        minimum_release_age: 7d
-        install: false
-        cache: false
-        github_token: ${{ steps.get-token.outputs.token }}
+        minimum_release_age: 7d # ignored upstream when version is set
+        install: false # the engine needs the mise binary, not the tools
+        cache: false # with nothing installed, upstream never saves one
+        github_token: ${{ steps.get-token.outputs.token }} # avoids the unauthenticated rate limit
         wings_enabled: false
-    # Must come before anything that reads config: a manifest carrying a
-    # [settings] block — which is exactly what the cooldown documentation
-    # tells consumers to add — makes mise hard-error on an untrusted config,
-    # including on the preflight check below. Trusting a directory with no
-    # config at all is a no-op, so this cannot mask a mistyped path.
+    # Before anything reads config: mise hard-errors on an untrusted [settings] block.
     - name: Trust config
       shell: bash
       working-directory: ${{ inputs.working-directory }}
       run: mise trust .
-    # mise never errors on a missing lockfile — it silently proceeds — so a
-    # mistyped working-directory would otherwise produce a green job that has
-    # checked nothing.
     - name: Preflight
       shell: bash
       working-directory: ${{ inputs.working-directory }}
       run: |
-        # A missing actions/checkout step leaves the workspace empty, which
-        # lands here as a missing manifest. It is the likeliest way to
-        # misconfigure this action, hence the hint.
         if ! mise config ls --json |
           jq -e --arg dir "$PWD" 'any(.[]; .path | startswith($dir + "/"))' >/dev/null; then
           echo "::error title=mise-update::no mise manifest in $PWD - make sure the repository is checked out"
@@ -100,11 +80,6 @@ runs:
           echo "::error title=mise-update::no mise lockfile (mise.lock) in $PWD"
           exit 1
         fi
-    # --local keeps the runner's global configuration out of scope, so the
-    # action can only ever propose changes to the consumer's project. A
-    # registry that fails here costs its tools, not the whole run: discovery
-    # falls back to an empty result and the lockfile pass still proposes what
-    # it can.
     - name: Discover outdated tools
       shell: bash
       working-directory: ${{ inputs.working-directory }}
@@ -124,11 +99,6 @@ runs:
         OUTDATED_PATH: ${{ runner.temp }}/mise-update-outdated.json
         PLAN_PATH: ${{ runner.temp }}/mise-update-plan.json
       run: |
-        # An edit to an untracked config could never reach the pull request,
-        # so the engine needs to know which sources git actually tracks.
-        # The `if` matters: a bare `&&` would make the loop — and so the step —
-        # exit non-zero as soon as a source is untracked, which is exactly the
-        # case this filter exists to report.
         tracked=$(jq -r '[.[].source.path // empty] | unique | .[]' "$OUTDATED_PATH" |
           while IFS= read -r path; do
             if git ls-files --error-unmatch -- "$path" >/dev/null 2>&1; then
@@ -137,11 +107,6 @@ runs:
           done)
         OUTDATED="$(cat "$OUTDATED_PATH")" TRACKED_PATHS="$tracked" \
           bash "$GITHUB_ACTION_PATH/scripts/engine.sh" plan >"$PLAN_PATH"
-    # `mise config set` edits configuration without installing anything, so
-    # mise owns the TOML edit and this action parses no TOML itself. The
-    # dotted key path must be written unquoted for backend-prefixed tools:
-    # quoting it silently appends a malformed duplicate key instead of
-    # updating the real one.
     - name: Apply manifest bumps
       shell: bash
       working-directory: ${{ inputs.working-directory }}
@@ -152,9 +117,6 @@ runs:
           [ -z "$name" ] && continue
           mise config set --file "$path" "tools.$name" "$to"
         done < <(jq -r '.bumps[] | [.name, .to, .path] | @tsv' "$PLAN_PATH")
-    # Runs after the manifest edits so the lockfile is consistent with the new
-    # manifest. --global is deliberately absent: on this subcommand it selects
-    # the runner's global lockfile rather than restricting scope.
     - name: Refresh lockfile
       shell: bash
       working-directory: ${{ inputs.working-directory }}
@@ -167,8 +129,6 @@ runs:
           echo "::warning title=mise-update::could not read lockfile changes"
           echo '[]' >"$LOCK_PATH"
         fi
-    # Annotations are what make problems visible on a run that produces no
-    # pull request at all — the case where everything errored.
     - name: Render pull request
       id: render
       shell: bash
@@ -198,18 +158,10 @@ runs:
           echo "PATHS_EOF"
         } >>"$GITHUB_OUTPUT"
 
-        # A tool mise cannot resolve at all is absent from the discovery
-        # output entirely, so a warning is the only trace it leaves. Reading
-        # those warnings is best-effort — they are not a stable interface —
-        # and never fails the run. They repeat across both logs, hence the
-        # de-duplication.
+        # An unresolvable tool leaves only a warning; best-effort, as warnings are no stable interface.
         grep -h 'WARN' "$DISCOVER_LOG" "$LOCK_LOG" 2>/dev/null |
           sed -e 's|^mise WARN *||' -e 's|^|::warning title=mise-update::|' |
           sort -u || true
-    # sign-commits attributes the commit to the GitHub App that minted the
-    # token, and makes create-pull-request ignore the committer and author
-    # inputs. delete-branch cleans the branch up once the proposal is no
-    # longer needed.
     - name: Create pull request
       id: create-pull-request # zizmor: ignore[superfluous-actions]
       uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1 # v8.1.1
@@ -221,13 +173,12 @@ runs:
         body-path: ${{ runner.temp }}/mise-update-body.md
         commit-message: ${{ steps.render.outputs.title }}
         labels: ${{ inputs.labels }}
-        sign-commits: true
+        sign-commits: true # attributes the commit to the app
         delete-branch: true
         draft: false
         signoff: false
         maintainer-can-modify: true
-    # An array rather than an object, so that per-tool pull requests, if added
-    # later, extend it without breaking callers.
+    # An array, so per-tool pull requests can be added without breaking callers.
     - name: Build pull-requests output
       id: build-output
       shell: bash
