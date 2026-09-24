@@ -27,8 +27,6 @@ So: `permissions: {}` at workflow level, **always**. A job overrides it only whe
 
 Document every granted scope with a comment on the same line, naming what needs it (`contents: read # required for checkout`). The same-line form is the only one that counts; a comment on the line above documents nothing.
 
-`mise run lint` runs `zizmor` at its `pedantic` persona, where the `undocumented-permissions` audit lives, so most of this is enforced: a scope with no comment fails the gate, and so does one whose only comment sits on the line above. The audit's one blind spot is `contents: read`, which it lets pass unannotated and this convention does not — that exemption is the part left resting on review alone, because a scope explains itself only next to the step that consumes it.
-
 Reusable workflows work differently and are out of scope here: permissions intersect down the call chain rather than replacing each other.
 
 ## App permissions are not workflow permissions
@@ -42,4 +40,4 @@ Copying the first list into the second is the common mistake. It reads plausible
 
 ## What the linters do not catch
 
-`zizmor`'s `excessive-permissions` judges a block in the absolute, never against what the jobs use: it flags a missing block, `read-all`, `write-all`, and every workflow-level `<scope>: write`. It never inspects the steps of a job, so a workflow-level `contents: write` is flagged even when every job needs it, and a workflow-level `contents: read` passes however useless it is. Neither `zizmor` nor `actionlint` can tell whether a granted scope is ever used, because that would mean knowing what every step does with the token. An unused permission passes `mise run lint` cleanly — `undocumented-permissions` checks that a scope is explained, never that it is needed. The rules above are the only check there is.
+`zizmor`'s `excessive-permissions` judges a block in the absolute, never against what the jobs use: it flags a missing block, `read-all`, `write-all`, and every workflow-level `<scope>: write`. It never inspects the steps of a job, so a workflow-level `contents: write` is flagged even when every job needs it, and a workflow-level `contents: read` passes however useless it is. Neither `zizmor` nor `actionlint` can tell whether a granted scope is ever used, because that would mean knowing what every step does with the token. An unused permission passes `mise run lint` cleanly.
