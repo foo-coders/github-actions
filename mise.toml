@@ -1,5 +1,4 @@
 [settings]
-# A week's hold keeps yanked releases out
 minimum_release_age = "7d"
 lockfile = true
 

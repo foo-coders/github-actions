@@ -4,6 +4,7 @@ A comment says **why**, never **what**. Write one only when the reason, constrai
 
 - **One line by preference.** A comment that needs a paragraph is usually telling a story; tell it in the commit message or pull request instead, where `git blame` finds it, and keep only the warning inline.
 - **Don't duplicate the docs.** When `docs/`, an action's `README.md`, `CONTEXT.md` or an ADR already explains something, the code carries no comment about it — not even a pointer to the doc. Docs are found through `AGENTS.md` and the READMEs, and a pointer in code goes stale when the doc moves.
+- **Functions get a one-line description.** The one "what" allowed: a single line above each shell function saying what it does.
 - **Repeated across files, still one line.** A reason that applies in several workflows is repeated in each, since a workflow is often read on its own, but kept to a single line.
 
 ## Required comments

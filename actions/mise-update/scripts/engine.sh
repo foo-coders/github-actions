@@ -10,11 +10,13 @@ set -euo pipefail
 #           PLAN + WORKING_DIRECTORY + WORKSPACE      -> files to commit
 #   branch  WORKING_DIRECTORY + BRANCH                -> branch name
 
+# Print usage and exit non-zero.
 usage() {
   echo "usage: engine.sh plan | render <title|body|annotations> | branch" >&2
   exit 2
 }
 
+# Classify every outdated tool into bumps, skips and errors.
 plan() {
   local outdated="${OUTDATED:-}"
   [ -n "$outdated" ] || outdated='{}'
@@ -66,7 +68,7 @@ plan() {
   '
 }
 
-# The lockfile says "core:node" where the manifest says "node".
+# Render one pull request artifact from the plan and lockfile changes.
 render() {
   local artifact="${1:-}"
   case "$artifact" in
@@ -85,6 +87,7 @@ render() {
     --arg workspace "${WORKSPACE:-${GITHUB_WORKSPACE:-}}" \
     --argjson plan "$plan" \
     --argjson lock "$lock" '
+    # The lockfile says "core:node" where the manifest says "node".
     def tool_id: ((.backend // .name // "") | sub("^core:"; ""));
     # Empty when a tool enters or leaves the lockfile.
     def versions:
@@ -156,7 +159,7 @@ render() {
   '
 }
 
-# "mise-update-." is no legal ref, and "mise-update/<path>" would collide with "mise-update".
+# Derive the pull request branch from the working directory.
 branch() {
   local override="${BRANCH:-}"
   if [ -n "$override" ]; then
@@ -174,6 +177,7 @@ branch() {
       -e 's|^[-.]*||' \
       -e 's|[-.]*$||')
 
+  # "mise-update-." is no legal ref, and "mise-update/<path>" would collide with "mise-update".
   if [ -z "$slug" ]; then
     echo "mise-update"
   else

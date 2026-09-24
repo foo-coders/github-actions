@@ -80,7 +80,6 @@ runs:
           echo "::error title=mise-update::no mise lockfile (mise.lock) in $PWD"
           exit 1
         fi
-    # A failing registry costs its tools, not the run: the lockfile pass still proposes what it can.
     - name: Discover outdated tools
       shell: bash
       working-directory: ${{ inputs.working-directory }}
@@ -174,7 +173,7 @@ runs:
         body-path: ${{ runner.temp }}/mise-update-body.md
         commit-message: ${{ steps.render.outputs.title }}
         labels: ${{ inputs.labels }}
-        sign-commits: true # attributes the commit to the app; ignores committer and author
+        sign-commits: true # attributes the commit to the app
         delete-branch: true
         draft: false
         signoff: false
