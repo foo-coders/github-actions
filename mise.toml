@@ -22,8 +22,6 @@ run = "prettier --check ."
 run = "actionlint"
 
 [tasks."lint:zizmor"]
-# pedantic adds undocumented-permissions and concurrency-limits. It has no
-# .github/zizmor.yml equivalent, so the flag is the only option.
 run = "zizmor --persona pedantic .github actions"
 
 [tasks.lint]
