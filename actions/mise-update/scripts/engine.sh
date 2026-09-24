@@ -177,7 +177,7 @@ branch() {
       -e 's|^[-.]*||' \
       -e 's|[-.]*$||')
 
-  # "mise-update-." is no legal ref, and "mise-update/<path>" would collide with "mise-update".
+  # "mise-update-." is no legal ref
   if [ -z "$slug" ]; then
     echo "mise-update"
   else
