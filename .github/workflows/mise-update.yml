@@ -2,14 +2,12 @@ name: Mise update
 
 on:
   schedule:
-    # Weekly, early Monday UTC, off the hour to avoid the cron rush.
     - cron: "30 4 * * 1"
   workflow_dispatch:
 
 permissions: {}
 
-# A manual run during a scheduled one would otherwise race it and could leave
-# a half-pushed branch behind.
+# A racing manual run could leave a half-pushed branch behind.
 concurrency:
   group: mise-update
   cancel-in-progress: false

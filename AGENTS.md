@@ -49,6 +49,10 @@ This governs the YAML that runs in this repository. The usage examples in `READM
 
 Comments state why, not what, preferably in one line — see [docs/code-comments.md](docs/code-comments.md) before writing or editing one.
 
+## Annotations
+
+An action reports problems as workflow annotations (`::error title=<action>::…`, `::warning title=<action>::…`), not only in its log or its output: on a run that produces nothing else — no pull request, no release — the annotations on the run summary are the only place a problem is visible.
+
 ## Documentation audience
 
 `README.md` files (root and each `actions/<name>/`) are consumer-facing: only what a caller of the action needs — usage, inputs/outputs, setup. Contributor-facing material (repo conventions, config internals, why something is built the way it is) belongs under `docs/` instead, linked from the relevant README or from this file. Keep each explanation in one of the two places and link to it from the other, rather than duplicating it.

@@ -25,9 +25,6 @@ outputs:
 runs:
   using: composite
   steps:
-    # A GITHUB_TOKEN-authored PR cannot trigger further workflow runs (GitHub
-    # blocks this to avoid recursive runs), so release-please's PRs would
-    # never get CI checks. Minting a GitHub App token works around that.
     - name: Get token
       id: get-token
       uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
@@ -51,10 +48,6 @@ runs:
         RUN_OUTPUTS: ${{ toJSON(steps.run-release-please.outputs) }}
       run: |
         echo "released=$(bash "$GITHUB_ACTION_PATH/scripts/build-released.sh")" >> "$GITHUB_OUTPUT"
-    # Release-please doesn't move rolling major tags itself, so do it here:
-    # force each released package's major tag (release tag with everything
-    # from the first "." stripped, see this action's README) to point at the
-    # commit it just released, for every package that released in this run.
     - name: Move major tags
       if: inputs.major-rolling-tag == 'true'
       shell: bash

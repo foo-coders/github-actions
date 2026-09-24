@@ -1,7 +1,5 @@
 [settings]
-# Hold a freshly-published version back, so one that is yanked or hotfixed in
-# its first week never reaches this repo. This governs every mise command run
-# here, not just the weekly update run. mise's own default is 24h.
+# A week's hold keeps yanked releases out
 minimum_release_age = "7d"
 lockfile = true
 

@@ -18,8 +18,7 @@ assert() {
   fi
 }
 
-# Plans are compared as JSON so a case can be written readably over several
-# lines without asserting on key order.
+# Compared as JSON so cases can span lines without asserting on key order.
 run_plan() {
   local name="$1" outdated="$2" tracked="$3" expected="$4"
   local actual
@@ -108,8 +107,6 @@ run_plan \
 
 # --- The corruption guard -------------------------------------------------
 
-# mise 2026.9.10 proposes "prefix:prefix:1.1" for a tool requested as
-# "prefix:1.30". Writing that would corrupt the manifest.
 run_plan \
   "the observed prefix: corruption is reported, never written" \
   '{"aqua:foo":{"name":"aqua:foo","requested":"prefix:1.30","bump":"prefix:prefix:1.1","source":{"type":"mise.toml","path":"/repo/mise.toml"}}}' \
