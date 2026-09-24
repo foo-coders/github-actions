@@ -7,6 +7,13 @@ on:
 
 permissions: {}
 
+# A newer push to a pull request supersedes the run before it, whose result is
+# already obsolete. A push to main is never cancelled: that would leave the
+# commit it verifies unlinted.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   lint:
     name: Lint

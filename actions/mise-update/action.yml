@@ -210,8 +210,17 @@ runs:
     # token, and makes create-pull-request ignore the committer and author
     # inputs. delete-branch cleans the branch up once the proposal is no
     # longer needed.
+    #
+    # superfluous-actions asks us to drop this action for a `gh pr create`
+    # script. We keep the action: it is pinned to a SHA per
+    # docs/pinning-third-party-actions.md, and sign-commits has no one-line
+    # `gh` equivalent. The suppression is inline rather than a .github/zizmor.yml
+    # `ignore` entry because those match on basename, and this repo has three
+    # action.yml files — a config rule would disarm the audit across all of them.
+    # It rides the `id:` line, not the `uses:` one, to leave the pinned SHA and
+    # its version comment as the only thing Dependabot has to rewrite there.
     - name: Create pull request
-      id: create-pull-request
+      id: create-pull-request # zizmor: ignore[superfluous-actions]
       uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1 # v8.1.1
       with:
         token: ${{ steps.get-token.outputs.token }}

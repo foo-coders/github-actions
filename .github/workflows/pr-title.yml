@@ -6,6 +6,13 @@ on:
 
 permissions: {}
 
+# An edit to the title supersedes the check of the one before it, whose result
+# is already obsolete. Every trigger here is a pull_request, so no run is worth
+# keeping alive.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   pr-title:
     name: Validate PR title
