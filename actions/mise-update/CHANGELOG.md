@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.2](https://github.com/foo-coders/github-actions/compare/mise-update/v1.0.1...mise-update/v1.0.2) (2026-09-29)
+
+
+### Bug Fixes
+
+* **mise-update:** commit dependency sidecars with the lockfile ([#35](https://github.com/foo-coders/github-actions/issues/35)) ([6cab770](https://github.com/foo-coders/github-actions/commit/6cab770b7c124c83d465082138398829614134f7))
+
 ## [1.0.1](https://github.com/foo-coders/github-actions/compare/mise-update/v1.0.0...mise-update/v1.0.1) (2026-09-24)
 
 
