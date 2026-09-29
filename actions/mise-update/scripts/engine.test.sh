@@ -35,10 +35,10 @@ run_render() {
 }
 
 run_add_paths() {
-  local name="$1" plan="$2" working_directory="$3" workspace="$4" expected="$5"
+  local name="$1" plan="$2" working_directory="$3" workspace="$4" sidecars="$5" expected="$6"
   local actual
   actual=$(PLAN="$plan" WORKING_DIRECTORY="$working_directory" WORKSPACE="$workspace" \
-    bash "$engine" render add-paths)
+    SIDECARS="$sidecars" bash "$engine" render add-paths)
   assert "$name" "$expected" "$actual"
 }
 
@@ -281,30 +281,52 @@ EOF
 run_add_paths \
   "only the edited manifests and the lockfile are committed" \
   '{"bumps":[{"name":"aqua:zizmor","from":"1.30.0","to":"1.30.1","release_url":null,"path":"/ws/mise.toml"}]}' \
-  "." "/ws" \
+  "." "/ws" "false" \
   "$(printf 'mise.lock\nmise.toml')"
 
 run_add_paths \
   "a lockfile-only run still commits the lockfile" \
-  "$empty_plan" "." "/ws" \
+  "$empty_plan" "." "/ws" "false" \
   "mise.lock"
 
 run_add_paths \
   "paths are relative to the workspace, under a nested working directory" \
   '{"bumps":[{"name":"aqua:zizmor","from":"1.30.0","to":"1.30.1","release_url":null,"path":"/ws/packages/app/mise.toml"}]}' \
-  "packages/app" "/ws" \
+  "packages/app" "/ws" "false" \
   "$(printf 'packages/app/mise.lock\npackages/app/mise.toml')"
 
 run_add_paths \
   "a working directory written as ./dir/ resolves the same way" \
-  "$empty_plan" "./packages/app/" "/ws" \
+  "$empty_plan" "./packages/app/" "/ws" "false" \
   "packages/app/mise.lock"
 
 run_add_paths \
   "two tools sharing one manifest list it once" \
   '{"bumps":[{"name":"a","from":"1","to":"2","release_url":null,"path":"/ws/mise.toml"},{"name":"b","from":"1","to":"2","release_url":null,"path":"/ws/mise.toml"}]}' \
-  "." "/ws" \
+  "." "/ws" "false" \
   "$(printf 'mise.lock\nmise.toml')"
+
+run_add_paths \
+  "the dependency sidecars are committed with the lockfile" \
+  '{"bumps":[{"name":"npm:prettier","from":"3.9.7","to":"3.9.8","release_url":null,"path":"/ws/mise.toml"}]}' \
+  "." "/ws" "true" \
+  "$(printf '.mise/locks\nmise.lock\nmise.toml')"
+
+run_add_paths \
+  "a lockfile-only move still commits the dependency sidecars" \
+  "$empty_plan" "." "/ws" "true" \
+  "$(printf '.mise/locks\nmise.lock')"
+
+run_add_paths \
+  "the dependency sidecars sit beside the lockfile, under a nested working directory" \
+  '{"bumps":[{"name":"npm:prettier","from":"3.9.7","to":"3.9.8","release_url":null,"path":"/ws/packages/app/mise.toml"}]}' \
+  "./packages/app/" "/ws" "true" \
+  "$(printf 'packages/app/.mise/locks\npackages/app/mise.lock\npackages/app/mise.toml')"
+
+run_add_paths \
+  "an unset sidecar flag proposes no sidecar directory" \
+  "$empty_plan" "." "/ws" "" \
+  "mise.lock"
 
 run_render \
   "errors are surfaced as workflow annotations" \
