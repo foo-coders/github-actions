@@ -129,6 +129,16 @@ runs:
           echo "::warning title=mise-update::could not read lockfile changes"
           echo '[]' >"$LOCK_PATH"
         fi
+    - name: Find dependency sidecars
+      id: find-sidecars
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      run: |
+        if [ -e .mise/locks ] || git ls-files --error-unmatch -- .mise/locks >/dev/null 2>&1; then
+          echo "sidecars=true" >>"$GITHUB_OUTPUT"
+        else
+          echo "sidecars=false" >>"$GITHUB_OUTPUT"
+        fi
     - name: Render pull request
       id: render
       shell: bash
@@ -136,6 +146,7 @@ runs:
         COMMIT_PREFIX: ${{ inputs.commit-prefix }}
         WORKING_DIRECTORY: ${{ inputs.working-directory }}
         WORKSPACE: ${{ github.workspace }}
+        SIDECARS: ${{ steps.find-sidecars.outputs.sidecars }}
         PLAN_PATH: ${{ runner.temp }}/mise-update-plan.json
         LOCK_PATH: ${{ runner.temp }}/mise-update-lock.json
         BODY_PATH: ${{ runner.temp }}/mise-update-body.md

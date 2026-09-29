@@ -72,6 +72,12 @@ Its body has up to three sections:
 
 A tool bumped in the manifest is listed only under **Manifest bumps**; the title's count is the number of distinct tools that moved either way.
 
+The commit carries only mise's files, never anything else in your working tree:
+
+- every manifest it rewrote;
+- `mise.lock`;
+- `.mise/locks/`, when your lockfile is version 2 and locks a tool's dependencies there. The new sidecar is added and the stale one removed, in the same commit as the lockfile that points at them.
+
 Commits are signed and attributed to your GitHub App, so it is clear at a glance who proposed the change.
 
 ## What gets rewritten, and what doesn't

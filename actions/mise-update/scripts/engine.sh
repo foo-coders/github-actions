@@ -7,7 +7,8 @@ set -euo pipefail
 #   render title|body|annotations
 #           PLAN + LOCK_CHANGES + COMMIT_PREFIX       -> pull request text
 #   render add-paths
-#           PLAN + WORKING_DIRECTORY + WORKSPACE      -> files to commit
+#           PLAN + WORKING_DIRECTORY + WORKSPACE
+#           + SIDECARS                                -> files to commit
 #   branch  WORKING_DIRECTORY + BRANCH                -> branch name
 
 # Print usage and exit non-zero.
@@ -85,6 +86,7 @@ render() {
     --arg prefix "${COMMIT_PREFIX:-chore(deps)}" \
     --arg dir "${WORKING_DIRECTORY:-.}" \
     --arg workspace "${WORKSPACE:-${GITHUB_WORKSPACE:-}}" \
+    --argjson sidecars "$([ "${SIDECARS:-}" = true ] && echo true || echo false)" \
     --argjson plan "$plan" \
     --argjson lock "$lock" '
     # The lockfile says "core:node" where the manifest says "node".
@@ -115,9 +117,10 @@ render() {
 
       # Other working-tree changes are not ours to propose.
       elif $artifact == "add-paths" then
-        (($dir | ltrimstr("./") | rtrimstr("/")) as $d
-         | (if $d == "" or $d == "." then "mise.lock" else $d + "/mise.lock" end)) as $lockfile
-        | (($bumps | map(.path | ltrimstr($workspace + "/"))) + [$lockfile])
+        ($dir | ltrimstr("./") | rtrimstr("/")
+         | if . == "" or . == "." then "" else . + "/" end) as $base
+        | (if $sidecars then [$base + ".mise/locks"] else [] end) as $sidecar_paths
+        | (($bumps | map(.path | ltrimstr($workspace + "/"))) + [$base + "mise.lock"] + $sidecar_paths)
         | unique
         | join("\n")
 
