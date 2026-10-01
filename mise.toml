@@ -22,8 +22,12 @@ run = "actionlint"
 [tasks."lint:zizmor"]
 run = "zizmor --persona pedantic .github actions"
 
+[tasks."lint:shellcheck"]
+shell = "bash -euo pipefail -c"
+run = "git ls-files -z --cached --others --exclude-standard '*.sh' | xargs -0 -r shellcheck"
+
 [tasks.lint]
-depends = [ "lint:format", "lint:actionlint", "lint:zizmor" ]
+depends = [ "lint:format", "lint:actionlint", "lint:zizmor", "lint:shellcheck" ]
 
 [tasks."test:mise-update"]
 run = "bash actions/mise-update/scripts/engine.test.sh"
