@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.3](https://github.com/foo-coders/github-actions/compare/mise-update/v1.0.2...mise-update/v1.0.3) (2026-10-05)
+
+
+### Bug Fixes
+
+* **mise-update:** link npm tools to their release notes ([#39](https://github.com/foo-coders/github-actions/issues/39)) ([1b56e08](https://github.com/foo-coders/github-actions/commit/1b56e08f1e16e29f547de0243d6d596f2d81e1fa))
+
 ## [1.0.2](https://github.com/foo-coders/github-actions/compare/mise-update/v1.0.1...mise-update/v1.0.2) (2026-09-29)
 
 
