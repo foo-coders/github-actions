@@ -22,7 +22,8 @@ assert() {
 run_plan() {
   local name="$1" outdated="$2" tracked="$3" expected="$4"
   local actual
-  actual=$(OUTDATED="$outdated" TRACKED_PATHS="$tracked" bash "$engine" plan | jq -S -c .)
+  actual=$(OUTDATED="$outdated" TRACKED_PATHS="$tracked" NPM_REPOSITORIES="${npm_repositories:-}" \
+    bash "$engine" plan | jq -S -c .)
   assert "$name" "$(jq -S -c . <<<"$expected")" "$actual"
 }
 
@@ -59,9 +60,47 @@ run_plan \
 
 run_plan \
   "a backend that publishes no release notes bumps with a null link" \
-  '{"npm:prettier":{"name":"npm:prettier","requested":"3.9.6","bump":"3.9.7","source":{"type":"mise.toml","path":"/repo/mise.toml"}}}' \
+  '{"cargo:ripgrep":{"name":"cargo:ripgrep","requested":"14.0.0","bump":"14.1.0","source":{"type":"mise.toml","path":"/repo/mise.toml"}}}' \
   '/repo/mise.toml' \
-  '{"bumps":[{"name":"npm:prettier","from":"3.9.6","to":"3.9.7","release_url":null,"path":"/repo/mise.toml"}],"skipped":[],"errors":[]}'
+  '{"bumps":[{"name":"cargo:ripgrep","from":"14.0.0","to":"14.1.0","release_url":null,"path":"/repo/mise.toml"}],"skipped":[],"errors":[]}'
+
+npm_prettier='{"npm:prettier":{"name":"npm:prettier","requested":"3.9.6","bump":"3.9.7","source":{"type":"mise.toml","path":"/repo/mise.toml"}}}'
+
+npm_repositories='{"prettier":"git+https://github.com/prettier/prettier.git"}'
+run_plan \
+  "an npm tool links to the releases of its GitHub repository" \
+  "$npm_prettier" \
+  '/repo/mise.toml' \
+  '{"bumps":[{"name":"npm:prettier","from":"3.9.6","to":"3.9.7","release_url":"https://github.com/prettier/prettier/releases","path":"/repo/mise.toml"}],"skipped":[],"errors":[]}'
+
+npm_repositories='{"prettier":"https://gitlab.com/prettier/prettier.git"}'
+run_plan \
+  "an npm tool whose repository is not on GitHub links to its npm version page" \
+  "$npm_prettier" \
+  '/repo/mise.toml' \
+  '{"bumps":[{"name":"npm:prettier","from":"3.9.6","to":"3.9.7","release_url":"https://www.npmjs.com/package/prettier/v/3.9.7","path":"/repo/mise.toml"}],"skipped":[],"errors":[]}'
+
+npm_repositories=''
+run_plan \
+  "an npm tool with no known repository links to its npm version page" \
+  "$npm_prettier" \
+  '/repo/mise.toml' \
+  '{"bumps":[{"name":"npm:prettier","from":"3.9.6","to":"3.9.7","release_url":"https://www.npmjs.com/package/prettier/v/3.9.7","path":"/repo/mise.toml"}],"skipped":[],"errors":[]}'
+
+npm_repositories='{"@scope/pkg":"git+ssh://git@github.com/scope/pkg.git"}'
+run_plan \
+  "a scoped npm tool is matched by its full name and reads ssh repositories" \
+  '{"npm:@scope/pkg":{"name":"npm:@scope/pkg","requested":"1.0.0","bump":"1.1.0","source":{"type":"mise.toml","path":"/repo/mise.toml"}}}' \
+  '/repo/mise.toml' \
+  '{"bumps":[{"name":"npm:@scope/pkg","from":"1.0.0","to":"1.1.0","release_url":"https://github.com/scope/pkg/releases","path":"/repo/mise.toml"}],"skipped":[],"errors":[]}'
+
+npm_repositories='{"prettier":"git+https://github.com/prettier/prettier.git"}'
+run_plan \
+  "a release link published by mise wins over the npm fallback" \
+  '{"npm:prettier":{"name":"npm:prettier","requested":"3.9.6","bump":"3.9.7","release_url":"https://example.test/prettier/3.9.7","source":{"type":"mise.toml","path":"/repo/mise.toml"}}}' \
+  '/repo/mise.toml' \
+  '{"bumps":[{"name":"npm:prettier","from":"3.9.6","to":"3.9.7","release_url":"https://example.test/prettier/3.9.7","path":"/repo/mise.toml"}],"skipped":[],"errors":[]}'
+npm_repositories=''
 
 run_plan \
   "a major-only spec is bumped" \
