@@ -3,7 +3,8 @@ set -euo pipefail
 
 # Pure: never invokes mise or the network, so engine.test.sh covers every decision.
 #
-#   plan    OUTDATED + TRACKED_PATHS                  -> plan JSON
+#   plan    OUTDATED + TRACKED_PATHS
+#           + NPM_REPOSITORIES                        -> plan JSON
 #   render title|body|annotations
 #           PLAN + LOCK_CHANGES + COMMIT_PREFIX       -> pull request text
 #   render add-paths
@@ -22,8 +23,12 @@ plan() {
   local outdated="${OUTDATED:-}"
   [ -n "$outdated" ] || outdated='{}'
 
+  local npm_repositories="${NPM_REPOSITORIES:-}"
+  [ -n "$npm_repositories" ] || npm_repositories='{}'
+
   jq -n -c \
     --argjson outdated "$outdated" \
+    --argjson npm_repositories "$npm_repositories" \
     --arg tracked "${TRACKED_PATHS:-}" '
     ($tracked | split("\n") | map(select(length > 0))) as $tracked_paths
 
@@ -35,6 +40,18 @@ plan() {
       # Array and tool-option specs are not strings; one must not crash the run.
       def as_text: if type == "string" then . else tojson end;
 
+      # mise publishes no release URL for npm: use the releases of the GitHub
+      # repository the package declares, else the package version page.
+      def npm_release_url($name; $version):
+        ($name | sub("^npm:"; "")) as $package
+        | ($npm_repositories[$package] // "") as $repository
+        | ($repository
+           | capture("(^github:|github\\.com[:/])(?<owner>[^/]+)/(?<repo>[^/]+?)(\\.git)?/?$")
+           // null) as $github
+        | if $github then "https://github.com/\($github.owner)/\($github.repo)/releases"
+          else "https://www.npmjs.com/package/\($package)/v/\($version)"
+          end;
+
       def classify:
         {
           name: (.name // ""),
@@ -43,6 +60,9 @@ plan() {
           url: (.release_url // null),
           path: (.source.path // "")
         }
+        | if .url == null and (.name | startswith("npm:")) and (.proposed | type == "string")
+          then .url = npm_release_url(.name; .proposed)
+          else . end
         | . + (
             if (.requested == "latest" or .requested == "lts") then
               {bucket: "skipped", reason: "floating"}

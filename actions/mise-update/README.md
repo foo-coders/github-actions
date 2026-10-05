@@ -66,7 +66,7 @@ One pull request per working directory, amended in place as new versions appear,
 
 Its body has up to three sections:
 
-- **Manifest bumps** — tools whose version spec was rewritten in the manifest, with a link to each release's notes. Some backends (notably `npm:`) publish no release URL, so that cell is legitimately blank.
+- **Manifest bumps** — tools whose version spec was rewritten in the manifest, with a link to each release's notes. mise publishes no release URL for `npm:` tools, so those link to the `/releases` page of the GitHub repository the package declares in the npm registry, or to the package's npm version page when it declares none. Other backends without a release URL leave that cell blank.
 - **Lockfile-only moves** — tools whose declared spec didn't change but which re-resolved to a new version. This is what catches patch-level movement inside a floating spec like `node = "26"`.
 - **Not updated** — tools the action could not process, with the reason. These are also emitted as workflow annotations, so you still see them on a run that produces no pull request at all.
 

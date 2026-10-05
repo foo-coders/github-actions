@@ -92,11 +92,29 @@ runs:
           echo "::warning title=mise-update::could not read outdated tools; proposing lockfile changes only"
           echo '{}' >"$OUTDATED_PATH"
         fi
+    # mise gives npm tools no release link; the engine builds one from the repository each package declares.
+    - name: Look up npm repositories
+      shell: bash
+      env:
+        OUTDATED_PATH: ${{ runner.temp }}/mise-update-outdated.json
+        NPM_REPOSITORIES_PATH: ${{ runner.temp }}/mise-update-npm-repositories.json
+      run: |
+        repositories='{}'
+        while IFS=$'\t' read -r package version; do
+          [ -z "$package" ] && continue
+          # Best-effort: without a repository the engine links to the npm version page.
+          url=$(curl -fsSL --max-time 20 "https://registry.npmjs.org/${package//\//%2F}/$version" 2>/dev/null |
+            jq -r '.repository | if type == "object" then .url else . end // empty' 2>/dev/null) || continue
+          [ -n "$url" ] || continue
+          repositories=$(jq -c --arg package "$package" --arg url "$url" '. + {($package): $url}' <<<"$repositories")
+        done < <(jq -r 'to_entries[] | select(.key | startswith("npm:")) | select(.value.release_url == null) | [(.key | ltrimstr("npm:")), (.value.bump | strings)] | @tsv' "$OUTDATED_PATH")
+        echo "$repositories" >"$NPM_REPOSITORIES_PATH"
     - name: Plan updates
       shell: bash
       working-directory: ${{ inputs.working-directory }}
       env:
         OUTDATED_PATH: ${{ runner.temp }}/mise-update-outdated.json
+        NPM_REPOSITORIES_PATH: ${{ runner.temp }}/mise-update-npm-repositories.json
         PLAN_PATH: ${{ runner.temp }}/mise-update-plan.json
       run: |
         tracked=$(jq -r '[.[].source.path // empty] | unique | .[]' "$OUTDATED_PATH" |
@@ -105,7 +123,7 @@ runs:
               echo "$path"
             fi
           done)
-        OUTDATED="$(cat "$OUTDATED_PATH")" TRACKED_PATHS="$tracked" \
+        OUTDATED="$(cat "$OUTDATED_PATH")" TRACKED_PATHS="$tracked" NPM_REPOSITORIES="$(cat "$NPM_REPOSITORIES_PATH")" \
           bash "$GITHUB_ACTION_PATH/scripts/engine.sh" plan >"$PLAN_PATH"
     - name: Apply manifest bumps
       shell: bash
