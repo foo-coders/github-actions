@@ -28,4 +28,7 @@ jobs:
         with:
           minimum_release_age: 7d
       - name: Run lint
+        env:
+          # zizmor runs its online audits only when it has a token.
+          GH_TOKEN: ${{ github.token }}
         run: mise run lint
