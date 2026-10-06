@@ -20,6 +20,10 @@ When adding or editing a `uses:` step that references an action outside this rep
 
 Wrapping a third-party action rather than referencing it directly has rules of its own — see [docs/wrapping-third-party-actions.md](docs/wrapping-third-party-actions.md) before adding a wrapper, or changing one's inputs or defaults.
 
+## Local actions
+
+Reference this repository's own actions with `uses: $/actions/<name>`, never `./` or an `@ref` — see [docs/self-repository-syntax.md](docs/self-repository-syntax.md) before writing one, or when actionlint reports `ref is missing`.
+
 ## Secrets
 
 Workflow secrets live in the `main-automation` GitHub environment rather than as repository secrets, and every job that reads one declares that environment. See [docs/secrets-environment.md](docs/secrets-environment.md) before adding a workflow or an action that consumes a secret.
