@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.0.6](https://github.com/foo-coders/github-actions/compare/mise-update/v1.0.5...mise-update/v1.0.6) (2026-10-23)
+
+
+### Bug Fixes
+
+* **deps:** bump actions/create-github-app-token from 3.2.0 to 3.3.0 in /actions/mise-update ([#53](https://github.com/foo-coders/github-actions/issues/53)) ([4d6b5ab](https://github.com/foo-coders/github-actions/commit/4d6b5ab6c8ca165bcc525d4526ad7d5d0bd0b6bf))
+* **deps:** bump jdx/mise-action from 5.1.1 to 5.2.0 in /actions/mise-update ([#52](https://github.com/foo-coders/github-actions/issues/52)) ([66c9f42](https://github.com/foo-coders/github-actions/commit/66c9f42e3b865b1c178ee42609f9dfc925a32234))
+
 ## [1.0.5](https://github.com/foo-coders/github-actions/compare/mise-update/v1.0.4...mise-update/v1.0.5) (2026-10-13)
 
 
