@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.2](https://github.com/foo-coders/github-actions/compare/release-please/v1.0.1...release-please/v1.0.2) (2026-10-23)
+
+
+### Bug Fixes
+
+* **deps:** bump actions/create-github-app-token from 3.2.0 to 3.3.0 in /actions/release-please ([#54](https://github.com/foo-coders/github-actions/issues/54)) ([304677b](https://github.com/foo-coders/github-actions/commit/304677bfe6659134f046d9c2328541bdf86597ae))
+
 ## [1.0.1](https://github.com/foo-coders/github-actions/compare/release-please/v1.0.0...release-please/v1.0.1) (2026-09-24)
 
 
