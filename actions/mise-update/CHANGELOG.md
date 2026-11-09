@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.8](https://github.com/foo-coders/github-actions/compare/mise-update/v1.0.7...mise-update/v1.0.8) (2026-11-09)
+
+
+### Bug Fixes
+
+* **deps:** bump jdx/mise-action from 5.2.2 to 5.2.4 in /actions/mise-update ([#64](https://github.com/foo-coders/github-actions/issues/64)) ([177322e](https://github.com/foo-coders/github-actions/commit/177322ed4f89474eabe41d65e616fa6482e2f352))
+
 ## [1.0.7](https://github.com/foo-coders/github-actions/compare/mise-update/v1.0.6...mise-update/v1.0.7) (2026-11-03)
 
 
