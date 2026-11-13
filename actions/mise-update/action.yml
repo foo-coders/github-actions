@@ -54,7 +54,7 @@ runs:
       run: |
         echo "branch=$(bash "$GITHUB_ACTION_PATH/scripts/engine.sh" branch)" >> "$GITHUB_OUTPUT"
     - name: Setup mise
-      uses: jdx/mise-action@6be3c7ed4c21d4f76b208d351d95aac273ebb76d # v5.2.4
+      uses: jdx/mise-action@b44d12e7d0d8ee7461bb893e1b1993500433185b # v5.2.7
       with:
         version: ${{ inputs.mise-version }}
         minimum_release_age: 7d # ignored upstream when version is set
