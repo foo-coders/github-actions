@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.2](https://github.com/foo-coders/github-actions/compare/conventional-pr-title/v1.0.1...conventional-pr-title/v1.0.2) (2026-11-16)
+
+
+### Bug Fixes
+
+* **deps:** bump amannn/action-semantic-pull-request from 6.1.1 to 6.1.2 in /actions/conventional-pr-title ([#68](https://github.com/foo-coders/github-actions/issues/68)) ([db6c499](https://github.com/foo-coders/github-actions/commit/db6c49917f9a598a7e646974a1b693316cf61bf8))
+
 ## [1.0.1](https://github.com/foo-coders/github-actions/compare/conventional-pr-title/v1.0.0...conventional-pr-title/v1.0.1) (2026-09-24)
 
 
