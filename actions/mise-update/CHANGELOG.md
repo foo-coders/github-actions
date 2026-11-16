@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.0.9](https://github.com/foo-coders/github-actions/compare/mise-update/v1.0.8...mise-update/v1.0.9) (2026-11-16)
+
+
+### Bug Fixes
+
+* **deps:** bump jdx/mise-action from 5.2.4 to 5.2.7 in /actions/mise-update ([#70](https://github.com/foo-coders/github-actions/issues/70)) ([47b04db](https://github.com/foo-coders/github-actions/commit/47b04dbd4018bce697635b28959512b9589ce8ce))
+* **deps:** bump peter-evans/create-pull-request from 8.1.1 to 8.1.2 in /actions/mise-update ([#69](https://github.com/foo-coders/github-actions/issues/69)) ([cd2424c](https://github.com/foo-coders/github-actions/commit/cd2424cf3c73e4b704b46cf04c064d3a29a3ce9c))
+
 ## [1.0.8](https://github.com/foo-coders/github-actions/compare/mise-update/v1.0.7...mise-update/v1.0.8) (2026-11-09)
 
 
